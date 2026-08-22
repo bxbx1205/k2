@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Aadhaar & PAN QR Verify",
-  description: "Secure, time-limited document verification demo",
+  title: "VaultID — Tokenized Document Verification",
+  description:
+    "Secure, consent-based identity verification with time-limited tokens. Store encrypted documents, generate verifiable tokens, and share safely via QR codes.",
+  keywords: ["KYC", "identity verification", "tokenized", "document sharing", "Aadhaar", "PAN", "QR verification"],
 };
 
 export default function RootLayout({
@@ -15,11 +27,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} antialiased bg-white text-gray-900 min-h-screen flex flex-col`}>
-        <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
-          {children}
-        </main>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="min-h-screen">
+        {children}
       </body>
     </html>
   );

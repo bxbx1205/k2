@@ -5,9 +5,9 @@ import { v4 as uuidv4 } from "uuid";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, docType, timeLimitSeconds } = body;
+    const { docType, timeLimitSeconds = 300 } = body;
 
-    if (!userId || !docType || !timeLimitSeconds) {
+    if (!docType) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -25,7 +25,6 @@ export async function POST(request: Request) {
     const sessionKey = `session:${sessionId}`;
 
     const sessionData = {
-      userId,
       docType,
       status: "pending",
       createdAt: new Date().toISOString(),
@@ -36,7 +35,7 @@ export async function POST(request: Request) {
       sessionKey,
       JSON.stringify(sessionData),
       "EX",
-      parseInt(timeLimitSeconds, 10)
+      parseInt(timeLimitSeconds.toString(), 10)
     );
 
     return NextResponse.json({
