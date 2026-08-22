@@ -45,7 +45,11 @@ export default function SBIDemoPage() {
       const res = await fetch("/api/session/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ docType: "pan", timeLimitSeconds: 300 }),
+        body: JSON.stringify({ 
+          docType: "pan", 
+          timeLimitSeconds: 300, 
+          requesterName: "State Bank of India" 
+        }),
       });
       const data = await res.json();
       if (data.sessionId) {

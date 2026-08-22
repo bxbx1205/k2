@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { docType, timeLimitSeconds = 300 } = body;
+    const { docType, timeLimitSeconds = 300, requesterName = "Unknown Entity" } = body;
 
     if (!docType) {
       return NextResponse.json(
@@ -26,6 +26,7 @@ export async function POST(request: Request) {
 
     const sessionData = {
       docType,
+      requesterName,
       status: "pending",
       createdAt: new Date().toISOString(),
     };
