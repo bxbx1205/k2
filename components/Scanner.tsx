@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 
 type SessionDetails = {
   docType: "aadhaar" | "pan";
@@ -19,31 +19,48 @@ export default function Scanner() {
   const [actionStatus, setActionStatus] = useState<"approved" | "rejected" | null>(null);
 
   useEffect(() => {
-    // Initialize scanner
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      false
-    );
+    if (session || actionStatus) return; // Don't start camera if already scanned
 
-    scanner.render(
+    const html5QrCode = new Html5Qrcode("qr-reader");
+
+    html5QrCode.start(
+      { facingMode: "environment" }, // Forces the back camera on mobile
+      { fps: 10, qrbox: { width: 250, height: 250 } },
       (decodedText) => {
-        // Handle successful scan
-        if (decodedText && !session && !loading) {
+        if (decodedText) {
           setSessionId(decodedText);
           handleCheckSession(decodedText);
-          scanner.clear().catch(console.error);
+          html5QrCode.stop().catch(console.error);
         }
       },
       (err) => {
-        // Ignore scan errors
+        // Ignore background scan errors
       }
-    );
+    ).catch(err => {
+      console.error("Camera start error:", err);
+      // Fallback for laptops without environment camera
+      if (err.name === "OverconstrainedError" || err.message?.includes("OverconstrainedError")) {
+        html5QrCode.start(
+          { facingMode: "user" },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText) => {
+            if (decodedText) {
+              setSessionId(decodedText);
+              handleCheckSession(decodedText);
+              html5QrCode.stop().catch(console.error);
+            }
+          },
+          () => {}
+        ).catch(console.error);
+      }
+    });
 
     return () => {
-      scanner.clear().catch(console.error);
+      if (html5QrCode.isScanning) {
+        html5QrCode.stop().catch(console.error);
+      }
     };
-  }, [session, loading]);
+  }, [session, actionStatus]);
 
   const handleCheckSession = async (idToUse = sessionId) => {
     if (!idToUse.trim()) return;
