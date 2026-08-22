@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, Loader2, CheckCircle2, XCircle, AlertCircle, Camera } from "lucide-react";
-import Link from "next/link";
+import { Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 
 type SessionDetails = {
@@ -11,7 +10,7 @@ type SessionDetails = {
   userId: string;
 };
 
-export default function ScanPage() {
+export default function Scanner() {
   const [sessionId, setSessionId] = useState("");
   const [session, setSession] = useState<SessionDetails | null>(null);
   
@@ -37,7 +36,7 @@ export default function ScanPage() {
         }
       },
       (err) => {
-        // Ignore scan errors as they happen constantly during scanning
+        // Ignore scan errors
       }
     );
 
@@ -103,17 +102,14 @@ export default function ScanPage() {
     setSession(null);
     setError(null);
     setActionStatus(null);
-    // Note: To fully reset scanner, a reload or complete re-initialization might be better, 
-    // but for demo purposes, window reload is simplest for scanner reset.
-    window.location.reload();
+    window.location.reload(); // Simple reset to reinitialize scanner
   };
 
   if (actionStatus) {
     return (
       <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in zoom-in-95 duration-300">
-        <button onClick={reset} className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Scan another
+        <button onClick={reset} className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline">
+          Scan Another QR
         </button>
         
         <div className={`border rounded-2xl p-8 shadow-sm text-center ${
@@ -140,9 +136,8 @@ export default function ScanPage() {
   if (session) {
     return (
       <div className="w-full max-w-md mx-auto space-y-6 animate-in slide-in-from-bottom-4 duration-300">
-        <button onClick={reset} className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Cancel
+        <button onClick={reset} className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline">
+          Cancel & Scan Again
         </button>
         
         <div className="bg-white border rounded-2xl p-6 shadow-lg">
@@ -178,11 +173,6 @@ export default function ScanPage() {
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
-      <Link href="/" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors">
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back home
-      </Link>
-      
       <div className="bg-white border rounded-2xl p-6 shadow-sm">
         <h2 className="text-2xl font-semibold mb-6">Scan QR</h2>
         
@@ -195,8 +185,6 @@ export default function ScanPage() {
 
         <div className="mb-6 overflow-hidden rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 relative">
           <div id="qr-reader" className="w-full [&>div]:border-none! [&>div>div]:border-none!"></div>
-          {/* html5-qrcode injects styles we need to override slightly with globals or specific IDs, 
-              but it should be usable as is. */}
         </div>
 
         <div className="relative flex py-2 items-center">
@@ -206,11 +194,11 @@ export default function ScanPage() {
         </div>
 
         <div className="mt-4 space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Manual Entry</label>
+          <label className="text-sm font-medium text-gray-700">Manual Entry (For Testing)</label>
           <div className="flex space-x-2">
             <input 
               type="text" 
-              placeholder="Paste session ID"
+              placeholder="Paste session code"
               className="flex-1 px-3 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all bg-gray-50 focus:bg-white text-sm"
               value={sessionId}
               onChange={e => setSessionId(e.target.value)}

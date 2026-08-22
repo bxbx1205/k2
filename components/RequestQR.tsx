@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Loader2, CheckCircle2, XCircle, Clock } from "lucide-react";
-import Link from "next/link";
+import { Loader2, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 type SessionStatus = "pending" | "approved" | "rejected" | "expired";
 
-export default function RequestPage() {
-  const [userId, setUserId] = useState("");
+export default function RequestQR({ userId }: { userId: string | null }) {
   const [docType, setDocType] = useState<"aadhaar" | "pan">("aadhaar");
   const [timeLimit, setTimeLimit] = useState(30);
   
@@ -23,7 +21,7 @@ export default function RequestPage() {
 
   const generateQR = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId.trim()) return;
+    if (!userId) return;
     
     setLoading(true);
     setStatus(null);
@@ -113,9 +111,8 @@ export default function RequestPage() {
 
     return (
       <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in zoom-in-95 duration-300">
-        <button onClick={startNew} className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          New Request
+        <button onClick={startNew} className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline">
+          Start New Request
         </button>
         
         <div className={`border rounded-3xl p-8 shadow-sm transition-colors duration-500 text-center ${
@@ -179,25 +176,14 @@ export default function RequestPage() {
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
-      <Link href="/" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors">
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back home
-      </Link>
-      
       <div className="bg-white border rounded-2xl p-6 shadow-sm">
         <h2 className="text-2xl font-semibold mb-6">Request Document</h2>
         <form onSubmit={generateQR} className="space-y-5">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700">User ID</label>
-            <input 
-              required
-              type="text" 
-              placeholder="Paste user ID from onboarding"
-              className="w-full px-3 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all bg-gray-50 focus:bg-white"
-              value={userId}
-              onChange={e => setUserId(e.target.value)}
-            />
-          </div>
+          {!userId && (
+            <div className="p-4 bg-yellow-50 border border-yellow-100 text-yellow-800 rounded-xl text-sm">
+              Please complete the Setup tab first to generate a QR code.
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Document Type</label>
@@ -254,7 +240,7 @@ export default function RequestPage() {
 
           <button 
             type="submit" 
-            disabled={loading || !userId.trim()}
+            disabled={loading || !userId}
             className="w-full mt-4 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors font-medium flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Generate QR"}
